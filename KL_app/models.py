@@ -3,12 +3,14 @@ from django.contrib.auth.models import AbstractUser
 from django.db import transaction
 from rest_framework.response import Response
 
+# modele    User
 class User(AbstractUser):
     adresse=models.CharField(max_length=100)
     telephone=models.CharField(max_length=10)
     def __str__(self):
          return self.username
     
+#Modele Collection
 class Collection(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)  
     date_updated = models.DateTimeField(auto_now=True) 
@@ -17,7 +19,8 @@ class Collection(models.Model):
     active=models.BooleanField(default=False)
     def __str__(self):
         return self.nom_collection
-
+    
+#Modele Modèles
 class Modele(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -44,7 +47,7 @@ class Modele(models.Model):
         return Response({'message': 'La commande a été passée avec succès.'})
     
 
-
+#Modele Accessoires
 class Accessoire(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -56,8 +59,16 @@ class Accessoire(models.Model):
     prix=models.IntegerField(default=0)
     disponible=models.BooleanField(default=False)
     def __str__(self):
-        return self.nom_accessoire  
+        return self.nom_accessoire
+        
+    @transaction.atomic    
+    def commander(self,request):
+        accessoire = self.get_object()
+        Commandeaccessoire(accessoire=accessoire,client=request.user).save()          
+        return Response({'message': 'La commande a été passée avec succès.'})
+    
 
+#Modele Commande modèle
 class Commandemodele (models.Model):
     client=models.ForeignKey(User,on_delete=models.CASCADE)
     modele=models.ForeignKey(Modele,on_delete=models.CASCADE)  
@@ -67,7 +78,9 @@ class Commandemodele (models.Model):
     confirme=models.BooleanField(default=False)
     def __str__(self):
         return f"{self.date_cmd}_{self.client.username}_{self.confirme}"
+    
 
+#Modele Commande accessoire
 class Commandeaccessoire (models.Model):
     client=models.ForeignKey(User,on_delete=models.CASCADE)
     accessoire=models.ForeignKey(Accessoire,on_delete=models.CASCADE)

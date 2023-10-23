@@ -99,8 +99,7 @@ class AccessoireViewSet(ModelViewSet):
     def commander(self, request, pk=None):
         accessoire = self.get_object()    
 
-        commande_accessoire = Commandeaccessoire(accessoire=accessoire,client=request.user)
-        commande_accessoire.save()
+        Commandeaccessoire(accessoire=accessoire,client=request.user).save()       
     
-        return Response({'message': 'La commande a été passée avec succès.'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'La commande a été passée avec succès.'})
     
