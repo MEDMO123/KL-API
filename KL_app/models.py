@@ -35,13 +35,13 @@ class Modele(models.Model):
     def commander(self,request):
         modele = self.get_object()
         taille =self.request.data.get('taille', None)
-
+        reception=request.data.get('reception', None)
         if not taille:
-            return Response({'message': 'Veuillez spécifier la taille de la tenue pour passer une commande.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Veuillez spécifier la taille de la tenue pour passer une commande.'})
        
-        Commandemodele(modele=modele, taille=taille, client=request.user).save()
+        Commandemodele(modele=modele, taille=taille,reception=reception, client=request.user).save()
         # Vous pouvez renvoyer une réponse de confirmation
-        return Response({'message': 'La commande a été passée avec succès.'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'La commande a été passée avec succès.'})
     
 
 

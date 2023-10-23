@@ -79,11 +79,12 @@ class ModeleViewSet(ModelViewSet):
     def commander(self, request, pk=None):
         modele = self.get_object()
         taille = request.data.get('taille', None)
+        reception=request.data.get('reception', None)
 
         if not taille:
             return Response({'message': 'Veuillez spécifier la taille de la tenue pour passer une commande.'})
        
-        Commandemodele(modele=modele, taille=taille, client=request.user).save()
+        Commandemodele(modele=modele, taille=taille, reception=reception,client=request.user).save()
         # Vous pouvez renvoyer une réponse de confirmation
         return Response({'message': 'La commande a été passée avec succès.'})
     
