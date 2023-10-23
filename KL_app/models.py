@@ -64,7 +64,8 @@ class Accessoire(models.Model):
     @transaction.atomic    
     def commander(self,request):
         accessoire = self.get_object()
-        Commandeaccessoire(accessoire=accessoire,client=request.user).save()          
+        reception=request.data.get('reception', None)
+        Commandeaccessoire(accessoire=accessoire,reception=reception, client=request.user).save()          
         return Response({'message': 'La commande a été passée avec succès.'})
     
 

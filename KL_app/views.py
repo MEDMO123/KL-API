@@ -97,9 +97,10 @@ class AccessoireViewSet(ModelViewSet):
 
     @action(detail=True, methods=['POST'])
     def commander(self, request, pk=None):
-        accessoire = self.get_object()    
+        accessoire = self.get_object() 
+        reception=request.data.get('reception', None)
 
-        Commandeaccessoire(accessoire=accessoire,client=request.user).save()       
+        Commandeaccessoire(accessoire=accessoire,reception=reception, client=request.user).save()       
     
         return Response({'message': 'La commande a été passée avec succès.'})
     
