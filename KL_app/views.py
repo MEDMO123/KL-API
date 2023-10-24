@@ -1,8 +1,10 @@
+from rest_framework import  filters
 from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
+
 from KL_app.models import *
 from KL_app.serializers import *
 
@@ -47,19 +49,17 @@ class AccessoireAdminViewSet(ModelViewSet):
        return queryset
     
 
-#Viewset pour la liste des commaandes de modeles
+#Viewset pour la liste des commandes de modeles
 class CmdModeleViewset(ModelViewSet):
     serializer_class=CmdModeleSerializer
     queryset=Commandemodele.objects.all()
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['confirme','reception','date_cmd'] 
+    
 
 #Viewset pour la liste des commaandes d'accessoires
 class CmdAccessoireViewset(ModelViewSet):
     serializer_class=CmdAccessoireSerializer
     queryset=Commandeaccessoire.objects.all() 
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['confirme','reception','date_cmd'] 
+    
   
 
 ##########################_ViewSets utilisateur_##################################################
@@ -79,7 +79,10 @@ class CollectionListViewSet(ReadOnlyModelViewSet):
    
 #Viewset pour la liste des modeles
 class ModeleListViewSet(ReadOnlyModelViewSet):
-    serializer_class=ModeleSerializer
+    serializer_class=ModeleSerializer     
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['genre']  
+
     def get_queryset(self):
        queryset=Modele.objects.filter(disponible=True)
        collection_id=self.request.GET.get('collection_id')
@@ -87,13 +90,14 @@ class ModeleListViewSet(ReadOnlyModelViewSet):
           queryset=queryset.filter(collection_id=collection_id)
        return queryset
     
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['genre','prix','collection']    
 
 
 #Viewset pour la liste des Accessoires
 class AccessoireListViewSet(ReadOnlyModelViewSet):
     serializer_class=AccessoireSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['genre']  
+
     def get_queryset(self):
        queryset=Accessoire.objects.filter(disponible=True)
        collection_id=self.request.GET.get('collection_id')
@@ -101,10 +105,6 @@ class AccessoireListViewSet(ReadOnlyModelViewSet):
           queryset=queryset.filter(collection_id=collection_id)
        return queryset
         
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['genre','prix','collection']   
-
-
 #Viewset pour commander un  modele
 class ModeleViewSet(ModelViewSet):
     queryset = Modele.objects.filter(disponible=True)
