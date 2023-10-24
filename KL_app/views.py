@@ -2,16 +2,18 @@ from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
 from KL_app.models import *
 from KL_app.serializers import *
 
+
 ##########################_ViewSets Admin_##################################################
 
-#Viewset pour les collections
-class AdminCollectionViewSet(ModelViewSet):
+#Viewset pour les  CRUD
+class CollectionAdminViewSet(ModelViewSet):
     serializer_class=ColllectionSerializer
     detail_serializer_class=ColllectionDetailSerializer  
-   
+    permission_classes=[IsAuthenticated]
 
     def get_queryset(self):    
         return Collection.objects.filter(active=True)        
@@ -20,22 +22,52 @@ class AdminCollectionViewSet(ModelViewSet):
             return self.detail_serializer_class
         return self.serializer_class   
 
-#Viewset pour les modeleles
+#Viewset pour gerer les modeles CRUD
+class ModeleAdminViewSet(ModelViewSet):
+    serializer_class=ModeleSerializer
+    permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+       queryset=Modele.objects.filter(disponible=True)
+       collection_id=self.request.GET.get('collection_id')
+       if collection_id:
+          queryset=queryset.filter(collection_id=collection_id)
+       return queryset
+
+#Viewset pour gerer les accessoires CRUD
+class AccessoireAdminViewSet(ModelViewSet):
+    serializer_class=AccessoireSerializer
+    permission_classes=[IsAuthenticated]
+    
+    def get_queryset(self):
+       queryset=Accessoire.objects.filter(disponible=True)
+       collection_id=self.request.GET.get('collection_id')
+       if collection_id:
+          queryset=queryset.filter(collection_id=collection_id)
+       return queryset
+    
+
+#Viewset pour la liste des commaandes de modeles
 class CmdModeleViewset(ModelViewSet):
     serializer_class=CmdModeleSerializer
     queryset=Commandemodele.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['confirme','reception','date_cmd'] 
 
+#Viewset pour la liste des commaandes d'accessoires
 class CmdAccessoireViewset(ModelViewSet):
     serializer_class=CmdAccessoireSerializer
-    queryset=Commandeaccessoire.objects.all()    
+    queryset=Commandeaccessoire.objects.all() 
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['confirme','reception','date_cmd'] 
+  
 
 ##########################_ViewSets utilisateur_##################################################
 
 #Viewset pour les collections
-class CollectionViewSet(ReadOnlyModelViewSet):
+class CollectionListViewSet(ReadOnlyModelViewSet):
     serializer_class=ColllectionSerializer
-    detail_serializer_class=ColllectionDetailSerializer  
-    # permission_classes=[IsAuthenticated]
+    detail_serializer_class=ColllectionDetailSerializer   
 
     def get_queryset(self):    
         return Collection.objects.filter(active=True)        
@@ -54,7 +86,9 @@ class ModeleListViewSet(ReadOnlyModelViewSet):
        if collection_id:
           queryset=queryset.filter(collection_id=collection_id)
        return queryset
-        
+    
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['genre','prix','collection']    
 
 
 #Viewset pour la liste des Accessoires
@@ -67,14 +101,16 @@ class AccessoireListViewSet(ReadOnlyModelViewSet):
           queryset=queryset.filter(collection_id=collection_id)
        return queryset
         
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['genre','prix','collection']   
 
-#Viewset pour les Commandes modeles
+
+#Viewset pour commander un  modele
 class ModeleViewSet(ModelViewSet):
     queryset = Modele.objects.filter(disponible=True)
     serializer_class = ModeleSerializer
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]    
 
-  
     @action(detail=True, methods=['POST'])
     def commander(self, request, pk=None):
         modele = self.get_object()
@@ -89,7 +125,7 @@ class ModeleViewSet(ModelViewSet):
         return Response({'message': 'La commande a été passée avec succès.'})
     
     
-#Viewset pour les Commandes accessoires   
+#Viewset pour  Commander  un accessoire  
 class AccessoireViewSet(ModelViewSet):
     queryset = Accessoire.objects.filter(disponible=True)
     serializer_class = AccessoireSerializer

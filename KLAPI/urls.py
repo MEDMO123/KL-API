@@ -23,12 +23,15 @@ from KL_app.views import *
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
 
 router=routers.SimpleRouter()
-router.register('collection',CollectionViewSet, basename='collection')
+router.register('collection',CollectionListViewSet, basename='collection')
 router.register('listemodele',ModeleListViewSet,basename='listemodele')
 router.register('listeaccessoire',AccessoireListViewSet,basename='listeaccessoire')
 router.register('modele',ModeleViewSet,basename='modele')
 router.register('accessoire',AccessoireViewSet,basename='accessoire')
-
+###ADMIN###
+router.register('admincollection',CollectionAdminViewSet, basename='admincollection')
+router.register('adminmodele',ModeleAdminViewSet,basename='adminmodele')
+router.register('adminaccessoire',AccessoireAdminViewSet,basename='adminaccessoire')
 router.register('cmdmodele',CmdModeleViewset,basename='cmdmodele')
 router.register('cmdaccessoire',CmdAccessoireViewset,basename='cmdaccessoire')
 urlpatterns = [
